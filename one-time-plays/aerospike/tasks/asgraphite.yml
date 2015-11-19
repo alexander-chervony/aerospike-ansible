@@ -1,0 +1,5 @@
+- name: "Copy new version of asgraphite service"
+  template: src=asgraphite.service.j2 dest=/usr/lib/systemd/system/asgraphite.service
+  notify:
+    - reload systemd
+    - enable asgraphite service

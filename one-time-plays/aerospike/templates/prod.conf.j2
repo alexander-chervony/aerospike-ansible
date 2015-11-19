@@ -1,0 +1,93 @@
+# {{ ansible_managed }}
+# Aerospike database configuration file.
+
+# This stanza must come first.
+service {
+        user root
+        group root
+        paxos-protocol v4
+        paxos-single-replica-limit 1 # Number of nodes where the replica count is automatically reduced to 1.
+        pidfile /var/run/aerospike/asd.pid
+        service-threads 32
+        transaction-queues 32
+        transaction-threads-per-queue 8
+        proto-fd-max 15000
+}
+
+logging {
+        # Log file must be an absolute path.
+        file /var/log/aerospike/aerospike.log {
+                context any info
+        }
+}
+
+network {
+        service {
+                address any
+                port 3000
+        }
+
+        heartbeat {
+                mode mesh
+                port 3002
+{% for ip in groups['aerospikeServers'] %}
+                mesh-seed-address-port {{ ip }} 3002
+{% endfor %}
+                interval 150
+                timeout 20
+        }
+
+        fabric {
+                port 3001
+        }
+
+        info {
+                port 3003
+        }
+}
+
+cluster {
+        mode dynamic
+{% for ip in ansible_all_ipv4_addresses %}
+{% if ip in groups['d2-aerospikeServers'] %}
+        self-group-id 1001
+{% endif %}
+{% if ip in groups['d1-aerospikeServers'] %}
+        self-group-id 2001
+{% endif %}
+{% endfor %}
+}
+
+namespace YourProjNamespace {
+        replication-factor 2
+{% for ip in ansible_all_ipv4_addresses %}
+{% if ip in groups['d2-aerospikeServers'] %}
+        memory-size 250G
+{% endif %}
+{% if ip in groups['d1-aerospikeServers'] %}
+        memory-size 300G
+{% endif %}
+{% endfor %}
+        default-ttl 0d # 90 days, use 0 to never expire/evict.
+
+        storage-engine device {
+{% for ip in ansible_all_ipv4_addresses %}
+{% if ip in groups['d2-aerospikeServers'] %}
+                device /dev/sdc
+                device /dev/sdd
+                device /dev/sde
+                device /dev/sdf
+                device /dev/sdg
+{% endif %}
+{% if ip in groups['d1-aerospikeServers'] %}
+                device /dev/sda
+                device /dev/sdb
+                device /dev/sdc
+                device /dev/sdd
+                device /dev/sde
+{% endif %}
+{% endfor %}
+                scheduler-mode noop
+                write-block-size 128K 
+       }
+}

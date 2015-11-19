@@ -1,0 +1,8 @@
+[p1-aerospikeServers]
+1.1.1.1
+
+[aerospikeServers:children]
+p1-aerospikeServers
+
+[aerospikeServers:vars]
+env=staging

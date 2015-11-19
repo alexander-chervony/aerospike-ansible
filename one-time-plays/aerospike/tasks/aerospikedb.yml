@@ -1,0 +1,31 @@
+- set_fact:
+    ae_tgz=/tmp/aerospike.tgz
+    ae_install=/tmp/aerospike_install
+
+- name: download latest enterprise server
+  get_url: url=http://{{ae_user}}:{{ae_password}}@www.aerospike.com/enterprise/download/server/{{ae_version}}/artifact/el6 dest={{ae_tgz}} force=yes
+
+- name: create install dir
+  file: state=directory path={{ae_install}}
+
+- name: unpack downloaded archive into install dir
+  shell: "tar -xvf {{ae_tgz}} --directory {{ae_install}} | head -1"
+  register: unarchive_root_dir
+
+- name: install server and tools
+  command: chdir="{{ae_install}}/{{ item }}" ./asinstall -Uvh --force
+  with_items: unarchive_root_dir.stdout_lines
+  notify:
+    - restart service
+
+- name: copy config for current env
+  template: src={{ env }}.conf.j2
+        dest=/etc/aerospike/aerospike.conf
+        backup=yes
+  notify:
+    - restart service
+
+- name: "Setup firewalld"
+  firewalld: port=3000-3004/tcp permanent=true state=enabled
+  notify: reload firewalld
+

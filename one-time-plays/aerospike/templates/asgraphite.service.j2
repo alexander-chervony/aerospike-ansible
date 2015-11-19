@@ -1,0 +1,13 @@
+[Unit]
+Description=aerospike graphite reporter
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/python /opt/aerospike/bin/asgraphite -s -n -l 'latency:' --start -g {{graphite_server}} -p {{graphite_port}} --prefix {{graphite_prefix}}.{{ ansible_hostname[6:8]|upper }}.
+ExecStop=/usr/bin/python /opt/aerospike/bin/asgraphite --stop -g {{graphite_server}} -p {{graphite_port}}
+PIDFile=/tmp/asgraphite.pid
+TimeoutSec=5
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

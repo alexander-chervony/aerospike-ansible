@@ -1,0 +1,4 @@
+# This Playbook would upgrade aerospike version if needed and/or update ae configs if changed and/or reconfigure asgraphite if needed
+
+- include: aerospikedb.yml
+- include: asgraphite.yml

@@ -1,0 +1,24 @@
+- name: restart service
+  service: name=aerospike state=restarted enabled=yes
+  register: ae_restarted
+  notify: wait until server successfully starts
+
+- name: wait until server successfully starts
+  shell: "tail -200 /var/log/aerospike/aerospike.log | grep 'soon there will be cake'"
+  when: ae_restarted|success
+  register: ae_tail
+  retries: 10
+  delay: 1
+  until: ae_tail.stdout.find("soon there will be cake") != -1
+  ignore_errors: true
+
+- name: reload firewalld
+  service: name=firewalld state=reloaded
+
+- name: reload systemd
+  command: systemctl daemon-reload
+
+- name: enable asgraphite service
+  service: name=asgraphite state=started enabled=yes
+  register: asgraphite_result
+  failed_when: "asgraphite_result|failed and 'most likely not notice when it exits' not in asgraphite_result.stderr"

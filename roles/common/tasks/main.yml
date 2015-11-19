@@ -1,0 +1,37 @@
+---
+# This role contains common plays that will run on all nodes.
+
+- name: Install python bindings for SE Linux
+  yum: name={{ item }} state=present
+  with_items:
+   - libselinux-python
+   - libsemanage-python
+
+- name: epel-release install
+  yum: name=epel-release state=present
+
+- name: Install pip
+  yum: name=python-pip state=present
+
+- name: Install httplib2
+  pip: name=httplib2
+
+- name: Install Java
+  yum: name=java state=present
+
+- name: Install Unzip
+  yum: name=unzip state=present
+
+- name: test to see if selinux is running
+  command: getenforce
+  register: sestatus
+  changed_when: false
+
+- name: "Ensure firewalld is started"
+  service: name=firewalld state=started
+
+- name: Set up authorized_keys for root user
+  authorized_key: user=root
+                  key="{{ item }}"
+  with_file:
+    - authorized_keys

@@ -1,0 +1,27 @@
+
+-
+  vars_prompt:
+  - name: "ae_user"
+    prompt: "Please enter Aerospike enterprise user name"
+    private: no
+
+  - name: "ae_password"
+    prompt: "Please enter Aerospike enterprise password"
+    private: no
+
+  - name: "ae_version"
+    prompt: "Please enter Aerospike version (latest default)"
+    private: no
+    default: "latest"
+
+  vars:
+    graphite_server: your.server.com
+    graphite_port: 2003
+    graphite_prefix: your-project-name.db.aerospike
+
+  hosts: aerospikeServers
+  max_fail_percentage: 1
+  serial: 1
+  roles:
+    - common
+    - one-time-plays/aerospike
