@@ -1,4 +1,4 @@
-# Ansible playbook to install/upgrade/downgrade aerospike server along with asgraphite (graphite reporting tool)
+#### Ansible playbook to install/upgrade/downgrade aerospike server along with asgraphite (graphite reporting tool)
 
 How to run:
 
