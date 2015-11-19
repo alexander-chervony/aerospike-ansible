@@ -1,7 +1,3 @@
-A playbook to **install/upgrade/downgrade aerospike** server along with **asgraphite** (aerospike's metrics graphite reporting tool)
-
-How to run:
-
 deployment (you will be prompted for aerospike enterprise user and pass):
 
 ```ansible-playbook -i production --limit 2.2.2.1,2.2.2.2 aerospike.yml -u root --ask-pass```
